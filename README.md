@@ -2,6 +2,8 @@
 
 Cách mình dùng Claude Code: một `CLAUDE.md`, vài skill dùng chung cho mọi dự án (**base**), và vài skill chép vào từng dự án (**project-local**). Phần lớn là ghép lại từ bộ skill của người khác, cộng vài tệp mình tự viết. Ghi lại để tự dùng và chia sẻ.
 
+Vì sao: máy viết code đã rẻ, thứ còn đắt là **biết nó đúng**, vì đọc code người khác (hay máy) viết tốn hơn tự viết. Nên mọi thứ ở đây nhắm một việc: tin được kết quả mà không phải đọc lại từng dòng. Người chấm tách khỏi người làm, bằng chứng là lệnh chạy lại được, bài học thành tệp thay vì thành lời nhắc.
+
 ## Hai tầng
 
 | Thư mục | Đặt ở đâu | Áp dụng cho |
@@ -72,8 +74,23 @@ Khi các nguồn nói khác nhau: `CLAUDE.md` của dự án → skill project-l
 | [`template/CLAUDE.template.md`](project-local/template/CLAUDE.template.md) | Khung `CLAUDE.md` của dự án: phần CORE (luật làm việc) giữ nguyên, 8 mục thông tin dự án (P1–P8) để điền |
 | [`project-core`](project-local/skills/project-core/SKILL.md) | Khảo sát repo rồi viết `CLAUDE.md` của dự án từ template, điền P1–P8 bằng dữ kiện thật |
 | [`change-control`](project-local/skills/change-control/SKILL.md) | Khi đổi code: truy caller và contract, kiểm regression, đồng bộ docs và changelog |
+| [`template/MR.template.md`](project-local/template/MR.template.md) | Khuôn mô tả MR/PR 5 mục: đổi gì, vì sao, bằng chứng (kèm đối chứng ngược), rủi ro và đường lùi, điều chưa kiểm được |
 
 `GLOSSARY.md` và `docs/adr/` do `glossary-keeper` ghi vào repo khi cần. Thứ gì chỉ vài dự án dùng (cổng CI riêng, routine chạy đêm…) thì thêm vào project-local của đúng dự án đó.
+
+## Khuyên và chặn
+
+`CLAUDE.md`, skill và agent là **lời khuyên**: agent đọc và thường làm theo, nhưng không gì ép. Thứ ép được là quyền trong `settings.json`, hook và CI, nên lớp chặn để ở project-local của từng repo. Vài điều mình rút ra khi dựng cổng:
+- Cổng nằm trong chính repo nó canh (script CI mà MR sửa được) thì người gửi MR sửa luôn được cổng. Chặn cho mọi người là branch protection phía git host.
+- Hook của Claude Code chỉ ràng buộc agent; `git commit --no-verify` vẫn lách được pre-commit.
+- Hook thu thập (ghi log, nạp ngữ cảnh) lỗi thì cho qua. Hook kiểm tra lỗi thì báo CHƯA ĐO và chặn, đừng cho qua im lặng. Đọc cấu hình bằng parser thay vì `source` (vì `source` chạy luôn mã trong tệp cấu hình), và đặt timeout cho lệnh trong hook.
+- Cổng mới phải phá thử: chưa chặn được lần nào thì chưa phải cổng.
+
+## Loop và routine
+
+Không có trong base, và mình chưa đưa vào project-local nào. Routine (agent chạy theo lịch, không người trực) chỉ đáng cho việc **máy móc, kiểm được và không bao giờ hết**: quét lỗi, đối chiếu, dọn dẹp; không giao việc viết tính năng. Chỉ thêm vào project-local của đúng repo khi đã đo được sản lượng (số phát hiện mới mỗi ngày, tỉ lệ được sửa); "chạy xong, rc=0" không tính. Thử `/loop` và `/schedule` có sẵn của Claude Code trước khi tự dựng engine.
+
+Khi viết prompt cho routine: prompt phải tự chứa vì mỗi lần chạy là một phiên mới; lấy ngày bằng lệnh `date`; ghi ngưỡng bằng số và một mục "trông có vấn đề nhưng không phải". Gọi `claude -p` từ script thì truyền prompt dài qua stdin (trên Linux, một đối số từ 128 KiB trở lên bị kernel từ chối: `Argument list too long`), và đặt prompt ngay sau `-p`, vì `--allowedTools` nhận nhiều giá trị và nuốt luôn chuỗi đứng sau nó.
 
 ## Mình setup thế nào
 
@@ -107,6 +124,8 @@ mkdir -p <repo>/.claude/skills
 cp -R project-local/skills/* <repo>/.claude/skills/
 cp project-local/template/CLAUDE.template.md <repo>/.claude/
 ```
+
+Khuôn MR thì chép vào chỗ git host đọc: `.github/pull_request_template.md` (GitHub) hoặc `.gitlab/merge_request_templates/Default.md` (GitLab).
 
 Template tên `CLAUDE.template.md` chứ không phải `CLAUDE.md`: Claude Code tự nạp mọi tệp tên đúng `CLAUDE.md` trong thư mục mà agent đọc tới, nên đặt tên đó thì khung trống sẽ bị nạp như luật thật.
 
