@@ -30,7 +30,7 @@
 
 ### P2. Nguồn luật và quyết định
 
-- Điền: hướng dẫn theo phạm vi; nguồn luật; thứ tự ưu tiên; vị trí skill repo/base; lựa chọn model/effort thực tế hoặc chưa xác minh; đặc tả/decision record; quyết định và mâu thuẫn. Base mặc định: Superpowers, Ponytail, code-en-doc-vi, glossary-keeper, retro; bổ sung theo luật môi trường.
+- Điền: hướng dẫn theo phạm vi; nguồn luật; thứ tự ưu tiên; vị trí skill repo/base; lựa chọn model/effort thực tế hoặc chưa xác minh; đặc tả/decision record; quyết định và mâu thuẫn. Base mặc định: Superpowers, Ponytail, code-en-doc-vi, glossary-keeper, retro, agent reviewer; bổ sung theo luật môi trường.
 - Dẫn đường dẫn thật, portable trong repo khi có; nguồn cá nhân chỉ ghi khi môi trường sử dụng và đã kiểm. Không coi tải skill từ internet là điều kiện để dùng CORE.
 - Ghi file changelog hiện có, đơn vị ghi và trigger bắt buộc. Nếu chưa có hoặc thiếu quy tắc, ghi rõ và đề xuất khi cần; không tự tạo chỉ để điền mục này.
 - Đủ khi: nguồn quan trọng truy được hoặc được đánh dấu thiếu; quy tắc cũ có nơi chuyển tới, không bị âm thầm bỏ. Quy tắc cũ trái mục tiêu dự án được nêu để chủ dự án quyết định thay thế.

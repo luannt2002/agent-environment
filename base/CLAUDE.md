@@ -4,7 +4,7 @@
 
 > **Thước đo mọi quy trình/đề xuất:** nó làm "tin-được-kết-quả" **RẺ đi hay ĐẮT lên**? Rẻ → làm. Đắt → bỏ.
 > **Hiệu chỉnh:** thiên **CHẮC hơn NHANH**; việc vặt → dùng phán đoán, đừng biến thành nghi lễ.
-> **Cổng:** chưa CHẶN được lần nào = chưa phải cổng → cố tình phá thử ≥1 lần để chứng minh.
+> **Cổng:** chưa CHẶN được lần nào = chưa phải cổng → cố tình phá thử ≥1 lần để chứng minh, rồi chứng minh vế ngược: ca đúng vẫn qua.
 
 ## Ba kiểu hỏng — quy trình không chặn kiểu nào thì bỏ
 
@@ -16,13 +16,20 @@
 
 ## Ba luật lõi — mỗi luật chặn một kiểu
 
-1. **Người chấm ≠ người làm.** Khâu soát = phiên RIÊNG, không có quyền sửa. Sửa được → tự chữa rồi tự khen. [Boris: grader = author → self-preferential bias.]
+1. **Người chấm ≠ người làm.** Khâu soát = phiên RIÊNG, không có quyền sửa. Sửa được → tự chữa rồi tự khen. [Boris: grader = author → self-preferential bias.] Review code → giao agent `reviewer`, truyền lệnh diff + đề bài; chụp vân tay cây làm việc trước và sau khi gọi, khác nhau thì bản soát vô hiệu: `{ git status --porcelain -uall; git diff HEAD; git ls-files -oz --exclude-standard | xargs -0r sha256sum; } | sha256sum`.
 2. **Đòi LỆNH, không nhận LỜI KHAI.** "Test pass" là lời khai. Bằng chứng = lệnh tự chạy lại được + cách tái hiện + bảng chân trị. Báo cáo dài **dời** gánh nặng đọc, không **giảm** nó. `rc=0` = máy CÓ chạy, không = kết quả ĐÚNG.
 3. **Sửa ở TẦNG CAO NHẤT.** Một lần → nói lại · lặp → luật/CLAUDE.md/skill · cả lớp → lint/CI/routine · routine sai → sửa routine. Sửa bằng chat là vá; viết thành luật là chữa. [Boris: fix the routine, not the PR.] Sau phiên khó, đề nghị người dùng gõ `/retro` để biến bài học thành tệp.
 
+## Nhận việc — chưa nói được "xong" thì chưa làm
+
+- Trước dòng code đầu tiên, viết ra **xong là gì** thành một phép thử TRƯỢT được ("làm cho tốt" không tính). Không viết được → trả lại kèm đúng câu còn thiếu. Việc nhỏ cũng cần dòng này.
+- Trước khi bắt tay, hỏi tối đa 3 câu chặn: chỉ câu mà trả lời khác thì làm khác; còn lại ghi giả định rồi đi tiếp.
+- Phân vùng bằng câu "sai thì có ai biết không". 🔴 quyền, tiền, xoá/migration, secret, đồng thời, API ra ngoài, thứ khó đảo ngược → nêu rõ trong báo cáo để người đọc từng dòng. 🟢 giao diện, chữ, docs, test, script chạy một lần, cấu hình có đường lùi → cổng máy là đủ. Còn lại 🟡 → người đọc mô tả và bằng chứng.
+
 ## Đo, đừng đoán
 
-- Số đưa vào kết luận phải từ lệnh VỪA chạy. Chưa đo thì ghi "chưa đo". Số của agent/docs khác mà mình chưa tự chạy cũng là số chưa đo.
+- Số đưa vào kết luận phải từ lệnh VỪA chạy. Chưa đo thì ghi "chưa đo". Số của agent/docs khác mà mình chưa tự chạy cũng là số chưa đo. Khẳng định về hành vi (thư viện, phiên bản, cờ CLI) thì chạy thử, hoặc trích tài liệu chính thức và ghi rõ là trích.
+- Ba trạng thái: ĐẠT / TRƯỢT / CHƯA ĐO. Phép kiểm không chạy được là CHƯA ĐO, không làm tròn thành đạt. Được bỏ qua nếu báo ra, cấm bỏ qua im lặng.
 - `grep` ra 0 → chưa được kết luận "thiếu"; mở tệp ra đọc (sai mẫu tìm phổ biến hơn thiếu thật).
 - Tách rạch ròi **Đã chứng minh** (có lệnh tái lập) và **Mới nghi** (kèm cách kiểm). Không đẩy nghi lên thành chứng minh cho báo cáo dày.
 - Không tìm thấy gì vẫn báo: "soi 40 chỗ, 0 phát hiện" là kết quả hợp lệ.
@@ -49,6 +56,7 @@ Việc có quy mô hoặc kiến trúc (tải cao, dữ liệu lớn, nhiều th
 - Giao MỤC TIÊU, không giao từng bước. Plan là bản tóm tắt (brief), nhắm dưới 400 dòng, không chép code vào plan.
 - **Được phản biện.** Giả định sai, có cách đơn giản hơn, plan sai → nói ra, đừng làm theo trong im lặng.
 - Song song → đo trước: trần thật của máy, và số tệp giao nhau giữa các agent phải bằng 0.
+- **Hai vòng là hết.** Lệch cùng một chuyện quá 2 lần → dừng, rewind (Esc hai lần) hoặc mở phiên mới với đề viết lại. Sửa bằng lời giữ lần thất bại trong ngữ cảnh. [Boris: /rewind thay vì sửa bằng lời.]
 
 ## Hai tầng đi ngược chiều
 
@@ -59,6 +67,8 @@ Việc có quy mô hoặc kiến trúc (tải cao, dữ liệu lớn, nhiều th
 ## Test đỏ — đỏ loại gì
 
 Ba loại: **môi trường** / **có sẵn từ trước** / **mới do mình**. Tách bằng ảnh chụp nhánh sạch, **đối chiếu theo TÊN test, không đếm số** (đếm vẫn xanh nếu ai đó lặng lẽ xoá một test).
+
+Xanh cũng phải đọc số: 0 test chạy (bộ lọc không khớp, bị skip hết) là **xanh rỗng**, không phải đạt.
 
 ## Bộ skill base và thứ bậc
 
@@ -71,6 +81,7 @@ Thứ tự khi mâu thuẫn: `CLAUDE.md` của dự án → skill project-local 
 | code-en-doc-vi | **ngôn ngữ**: identifier tiếng Anh, giải thích tiếng Việt |
 | glossary-keeper | **thuật ngữ** dự án và quyết định khó đảo ngược |
 | retro | gõ `/retro` sau phiên để đề xuất sửa môi trường |
+| agent `reviewer` | **soát độc lập** một diff theo đề bài và chuẩn code của repo: ĐẠT / TRƯỢT / CHƯA ĐO |
 
 Việc nhỏ (vài dòng, cấu hình): bỏ brainstorming và writing-plans; TDD vẫn giữ khi sửa logic.
 

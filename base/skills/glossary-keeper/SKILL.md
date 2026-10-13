@@ -59,6 +59,6 @@ Thiếu một điều kiện thì không ghi. Người dùng đồng ý mới gh
 {1–3 câu: bối cảnh, đã chọn gì, vì sao.}
 ```
 
-Đánh số tiếp theo số lớn nhất trong `docs/adr/`: `0001-slug.md`, `0002-slug.md`… Chỉ thêm mục *Trạng thái*, *Phương án đã cân nhắc*, *Hệ quả* khi chúng thật sự giúp người đọc sau.
+Đánh số tiếp theo số lớn nhất trong `docs/adr/`: `0001-slug.md`, `0002-slug.md`… Chỉ thêm mục *Trạng thái*, *Phương án đã cân nhắc*, *Hệ quả*, *Lật lại khi* (điều kiện đo được mà xảy ra thì phải xem lại quyết định) khi chúng thật sự giúp người đọc sau.
 
 Loại quyết định đáng ghi: hình dạng kiến trúc · cách các ngữ cảnh giao tiếp với nhau · công nghệ khó thay · ranh giới sở hữu dữ liệu · chỗ cố ý đi khác lối thông thường · ràng buộc không nhìn thấy trong code · phương án bị loại với lý do không hiển nhiên.
