@@ -16,7 +16,7 @@
 
 ## Ba luật lõi — mỗi luật chặn một kiểu
 
-1. **Người chấm ≠ người làm.** Khâu soát = phiên RIÊNG, không có quyền sửa. Sửa được → tự chữa rồi tự khen. [Boris: grader = author → self-preferential bias.]
+1. **Người chấm ≠ người làm.** Khâu soát = phiên RIÊNG, không có quyền sửa. Sửa được → tự chữa rồi tự khen. [Boris: grader = author → self-preferential bias.] Review code → giao agent `reviewer`, truyền lệnh diff + đề bài; chụp vân tay cây làm việc trước và sau khi gọi, khác nhau thì bản soát vô hiệu: `{ git status --porcelain -uall; git diff HEAD; git ls-files -oz --exclude-standard | xargs -0r sha256sum; } | sha256sum`.
 2. **Đòi LỆNH, không nhận LỜI KHAI.** "Test pass" là lời khai. Bằng chứng = lệnh tự chạy lại được + cách tái hiện + bảng chân trị. Báo cáo dài **dời** gánh nặng đọc, không **giảm** nó. `rc=0` = máy CÓ chạy, không = kết quả ĐÚNG.
 3. **Sửa ở TẦNG CAO NHẤT.** Một lần → nói lại · lặp → luật/CLAUDE.md/skill · cả lớp → lint/CI/routine · routine sai → sửa routine. Sửa bằng chat là vá; viết thành luật là chữa. [Boris: fix the routine, not the PR.] Sau phiên khó, đề nghị người dùng gõ `/retro` để biến bài học thành tệp.
 
@@ -71,6 +71,7 @@ Thứ tự khi mâu thuẫn: `CLAUDE.md` của dự án → skill project-local 
 | code-en-doc-vi | **ngôn ngữ**: identifier tiếng Anh, giải thích tiếng Việt |
 | glossary-keeper | **thuật ngữ** dự án và quyết định khó đảo ngược |
 | retro | gõ `/retro` sau phiên để đề xuất sửa môi trường |
+| agent `reviewer` | **soát độc lập** một diff theo đề bài và chuẩn code của repo: ĐẠT / TRƯỢT / CHƯA ĐO |
 
 Việc nhỏ (vài dòng, cấu hình): bỏ brainstorming và writing-plans; TDD vẫn giữ khi sửa logic.
 

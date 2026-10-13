@@ -6,7 +6,7 @@ Cách mình dùng Claude Code: một `CLAUDE.md`, vài skill dùng chung cho m�
 
 | Thư mục | Đặt ở đâu | Áp dụng cho |
 |---|---|---|
-| `base/` | `~/.claude/` | Mọi dự án trên máy |
+| `base/` | `~/.claude/` (skill vào `skills/`, agent vào `agents/`) | Mọi dự án trên máy |
 | `project-local/` | `<repo>/.claude/` (skill vào `skills/`, cộng tệp template) | Chỉ repo đó |
 
 Cách xếp: chép sang dự án **nào** cũng đúng và cũng cần thì để ở base; chỉ đúng với một dự án, hoặc chỉ khi dự án có thứ gì đặc biệt, thì để ở project-local.
@@ -21,6 +21,7 @@ Cách xếp: chép sang dự án **nào** cũng đúng và cũng cần thì đ�
 | [`code-en-doc-vi`](base/skills/code-en-doc-vi/SKILL.md) | Identifier tiếng Anh; comment, docs tiếng Việt | Tự viết |
 | [`glossary-keeper`](base/skills/glossary-keeper/SKILL.md) | Giữ thuật ngữ dự án trong `GLOSSARY.md`, quyết định khó đảo ngược trong ADR | Chuyển thể từ `domain-modeling` của [mattpocock/skills](https://github.com/mattpocock/skills) |
 | [`retro`](base/skills/retro/SKILL.md) | Gõ `/retro` sau phiên: đề xuất sửa môi trường (check, chuẩn code, steering file) thay vì sửa code | Chuyển thể từ `retro` của [mattpocock/skills](https://github.com/mattpocock/skills) |
+| [agent `reviewer`](base/agents/reviewer.md) | Người soát độc lập: đối chiếu diff với đề bài và chuẩn code của repo, đòi lệnh chạy lại được, kết luận ĐẠT / TRƯỢT / CHƯA ĐO. Không có quyền Edit/Write | Tự viết; hai trục Đề bài / Chuẩn chuyển thể từ `code-review` của [mattpocock/skills](https://github.com/mattpocock/skills) |
 
 ## Luồng base trong một phiên
 
@@ -39,11 +40,11 @@ Cách xếp: chép sang dự án **nào** cũng đúng và cũng cần thì đ�
 | Có spec cho việc nhiều bước | `writing-plans` → `subagent-driven-development` hoặc `executing-plans` |
 | Viết hoặc sửa logic | `test-driven-development`, cộng ponytail và `code-en-doc-vi` |
 | Gặp lỗi, test đỏ | `systematic-debugging` |
-| Sắp báo "xong" | `verification-before-completion`, rồi `requesting-code-review` |
+| Sắp báo "xong" | `verification-before-completion`, rồi giao agent `reviewer` (thay cho subagent `general-purpose` mà `requesting-code-review` gọi) |
 | Xong nhánh | `finishing-a-development-branch`; người chọn merge, PR hay giữ |
 | Muốn soát theo kiểu ponytail: code thừa, cộng lỗi, bảo mật, test còn thiếu | `ponytail-review` (một diff), `ponytail-audit` (cả repo) |
 
-**Sau phiên** vất vả, gõ `/retro`. Lỗi máy móc thì thành check (lint, hook, CI); lỗi cần phán đoán thì thành luật trong chuẩn code; `CLAUDE.md` chỉ thêm con trỏ điều hướng. Bài học thành tệp, lần sau khỏi phải nhắc.
+**Sau phiên** vất vả, gõ `/retro`. Lỗi máy móc thì thành check (lint, hook, CI); lỗi cần phán đoán thì thành luật trong `CODING_STANDARDS.md`, nơi agent `reviewer` đọc khi review; `CLAUDE.md` chỉ thêm con trỏ điều hướng. Bài học thành tệp, lần sau khỏi phải nhắc.
 
 ```
 mở phiên ─► CLAUDE.md · using-superpowers · luật ponytail · mô tả skill
@@ -55,10 +56,12 @@ việc nhỏ: vào thẳng code
    │
 code ─► test-driven-development · ponytail · code-en-doc-vi · lỗi → systematic-debugging
    │
-báo xong ─► verification-before-completion ─► review ─► finishing-a-development-branch
+báo xong ─► verification-before-completion ─► agent reviewer ─► finishing-a-development-branch
    │
 sau phiên ─► /retro ─► bài học thành tệp
 ```
+
+Agent `reviewer` không có Edit/Write, nhưng vẫn có Bash để chạy test, nên về kỹ thuật vẫn ghi được tệp. Vì vậy `base/CLAUDE.md` bắt phiên chính chụp vân tay nội dung cây làm việc trước và sau khi gọi nó: khác nhau thì bản soát vô hiệu. Chỉ so `git status` là không đủ, vì sửa thêm vào một tệp đã sửa sẵn thì `git status` không đổi. Vân tay cũng không thấy tệp bị gitignore.
 
 Khi các nguồn nói khác nhau: `CLAUDE.md` của dự án → skill project-local → `CLAUDE.md` base → skill base. Superpowers quyết quy trình, ponytail quyết viết bao nhiêu code. Luật của mình: ponytail chỉ được nới khối lượng code; test, validation, bảo mật và xử lý mất dữ liệu vẫn giữ nguyên.
 
@@ -91,8 +94,9 @@ Trước khi chép, xem chỗ đích đã có skill cùng tên chưa:
 Rồi chép skill và `CLAUDE.md` từ repo này:
 
 ```bash
-mkdir -p ~/.claude/skills
+mkdir -p ~/.claude/skills ~/.claude/agents
 cp -R base/skills/* ~/.claude/skills/
+cp base/agents/*.md ~/.claude/agents/
 [ -e ~/.claude/CLAUDE.md ] || cp base/CLAUDE.md ~/.claude/CLAUDE.md   # đã có thì giữ, tự gộp tay
 ```
 
@@ -108,13 +112,13 @@ Template tên `CLAUDE.template.md` chứ không phải `CLAUDE.md`: Claude Code 
 
 Mở Claude Code trong repo đó và nhờ: *"Dùng skill project-core để viết CLAUDE.md cho repo này. Chỉ sửa CLAUDE.md, không sửa code."* Commit `CLAUDE.md`, `.claude/skills/` và `.claude/CLAUDE.template.md` cùng repo; thiếu template thì `project-core` sẽ dừng lại hỏi.
 
-Sau khi chép, mở **phiên mới** rồi gõ `/skills` để chắc skill đã được nạp. Phiên đầu tiên có ponytail, hook của nó chép một script statusline vào `~/.claude/` và Claude sẽ đề nghị thêm `statusLine` vào `settings.json`; không cần thì từ chối.
+Sau khi chép, mở **phiên mới** rồi gõ `/skills` và `/agents` để chắc skill và agent đã được nạp. Phiên đầu tiên có ponytail, hook của nó chép một script statusline vào `~/.claude/` và Claude sẽ đề nghị thêm `statusLine` vào `settings.json`; không cần thì từ chối.
 
 ## Nguồn
 
 - **superpowers** — Jesse Vincent, MIT, <https://github.com/obra/superpowers>. Cài qua plugin, repo này không chép mã.
 - **ponytail** — Dietrich Gebert, MIT, <https://github.com/DietrichGebert/ponytail>. Cài qua plugin, repo này không chép mã.
-- **`glossary-keeper`, `retro`** — chuyển thể và dịch từ skill [`domain-modeling`](https://github.com/mattpocock/skills/tree/49dd158d1076134a641b33efb035946536778336/skills/engineering/domain-modeling) và [`retro`](https://github.com/mattpocock/skills/tree/49dd158d1076134a641b33efb035946536778336/skills/engineering/retro) của [mattpocock/skills](https://github.com/mattpocock/skills) (Copyright (c) 2026 Matt Pocock, [MIT](https://github.com/mattpocock/skills/blob/main/LICENSE)), bản đọc tại commit `49dd158`.
+- **`glossary-keeper`, `retro`, hai trục của agent `reviewer`** — chuyển thể và dịch từ skill [`domain-modeling`](https://github.com/mattpocock/skills/tree/49dd158d1076134a641b33efb035946536778336/skills/engineering/domain-modeling), [`retro`](https://github.com/mattpocock/skills/tree/49dd158d1076134a641b33efb035946536778336/skills/engineering/retro) và [`code-review`](https://github.com/mattpocock/skills/tree/49dd158d1076134a641b33efb035946536778336/skills/engineering/code-review) của [mattpocock/skills](https://github.com/mattpocock/skills) (Copyright (c) 2026 Matt Pocock, [MIT](https://github.com/mattpocock/skills/blob/main/LICENSE)), bản đọc tại commit `49dd158`.
 - **Ba luật "Đơn giản trước / Sửa phẫu thuật / Nói giả định" và ý "được phản biện" trong `base/CLAUDE.md`** — chuyển thể từ [Karpathy-Inspired Claude Code Guidelines](https://github.com/multica-ai/andrej-karpathy-skills) (trước là `forrestchang/andrej-karpathy-skills`), đúc từ nhận xét của Andrej Karpathy. Repo đó không ghi giấy phép. Ghi tại chỗ bằng `[Karpathy guidelines: …]`.
 - **Các ý ghi `[Boris: …]` trong `base/CLAUDE.md`** — từ chia sẻ công khai của Boris Cherny (Claude Code) tại <https://howborisusesclaudecode.com/>.
 - Phần còn lại mình tự viết.
